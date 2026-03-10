@@ -1,0 +1,37 @@
+# shipkart-productinfo-service
+spring:
+    application:
+        name: product-info
+
+server:
+    port: 8082
+
+management:
+    health:
+        defaults:
+            enabled: true
+        circuitbreakers:
+            enabled: true
+    endpoints:
+        web:
+            exposure:
+                include:
+                    - "*"
+    endpoint:
+        health:
+            show-details: always
+            show-components: always
+        circuitbreakers:
+            enabled: true
+
+resilience4j.circuitbreaker:
+    instances:
+        infoServiceCircuitBreaker:
+            registerHealthIndicator: true
+            sliding-window-type: COUNT_BASED
+            # Add these for easier testing:
+            slidingWindowSize: 10
+            minimumNumberOfCalls: 5
+            failureRateThreshold: 50
+            waitDurationInOpenState: 20s
+            permittedNumberOfCallsInHalfOpenState: 2

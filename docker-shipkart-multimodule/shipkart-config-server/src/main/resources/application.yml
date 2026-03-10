@@ -1,0 +1,24 @@
+spring:
+    application:
+        name: config-server
+    cloud:
+        config:
+            server:
+                git:
+                    uri: https://github.com/manishbhatt94/microservices-config-source-shristi
+                    default-label: docker-based
+                    clone-on-start: true
+                    basedir: ${java.io.tmpdir}/spring-config-src/microservices-config-source-shristi/docker-based
+
+server:
+    port: 8888
+
+management:
+    endpoints:
+        web:
+            exposure:
+                include:
+                    - health
+    endpoint:
+        health:
+            show-details: always

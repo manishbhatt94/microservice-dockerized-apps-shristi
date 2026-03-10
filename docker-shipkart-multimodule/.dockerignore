@@ -1,0 +1,99 @@
+# ============================================================
+# .dockerignore — Root docker ignore file
+# ============================================================
+
+
+# ---- Compiled output ----------------------------------------
+**/target/
+**/*.class
+**/*.jar
+
+# Exception: we DO want Maven wrapper JARs if you use ./mvnw
+!**/.mvn/wrapper/maven-wrapper.jar
+
+
+# ---- IDE: IntelliJ IDEA -------------------------------------
+**/.idea/
+**/*.iml
+**/*.iws
+**/*.ipr
+**/out/
+
+
+# ---- IDE: Eclipse & STS -------------------------------------
+**/.settings/
+**/.classpath
+**/.factorypath
+**/.project
+**/.springBeans
+**/.sts4-cache/
+**/.apt_generated/
+**/.apt_generated_test/
+
+
+# ---- Maven wrapper (builder image already has Maven) --------
+**/mvnw
+**/mvnw.cmd
+**/.mvn/
+
+
+# ----- Maven local repository cache -----
+# If anyone ever ran Maven with -Dmaven.repo.local inside the project folder
+**/.m2/
+
+
+# ---- Git ----------------------------------------------------
+.git/
+.gitignore
+.gitattributes
+
+
+# ---- macOS --------------------------------------------------
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+.Spotlight-V100
+.Trashes
+
+# iCloud generated files
+*.icloud
+
+
+# ---- Windows ------------------------------------------------
+Thumbs.db
+Thumbs.db:encryptable
+ehthumbs.db
+ehthumbs_vista.db
+[Dd]esktop.ini
+$RECYCLE.BIN/
+*.lnk
+
+# Windows Installer files
+*.cab
+*.msi
+*.msix
+*.msm
+*.msp
+
+
+# ---- Logs ---------------------------------------------------
+**/*.log
+**/logs/
+
+
+# ---- Docker files themselves --------------------------------
+**/Dockerfile
+**/Dockerfile.dockerignore
+docker-compose.yml
+.dockerignore
+
+
+# ---- STS generated empty site folder ------------------------
+src/
+
+
+# ---- Docs ---------------------------------------------------
+**/HELP.md
+**/README.md
+*.md

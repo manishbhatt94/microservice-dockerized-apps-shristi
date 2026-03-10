@@ -1,0 +1,132 @@
+networks:
+    shipkart-network:
+        driver: bridge
+
+volumes:
+    mysql-data:
+
+services:
+    mysql:
+        image: mysql:8
+        container_name: mysql-container
+        ports:
+            - 3307:3306
+        environment:
+            MYSQL_ROOT_PASSWORD: manish
+            MYSQL_DATABASE: shipkartdb
+        networks:
+            - shipkart-network
+        # Healthcheck for MySQL — checks if the DB is accepting connections
+        healthcheck:
+            test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-pmanish"]
+            interval: 10s      # run this check every 10 seconds
+            timeout: 5s        # if check takes longer than 5s, count as failed
+            retries: 5         # after 5 consecutive failures, mark as unhealthy
+            start_period: 30s  # give MySQL 30s to initialise before checks begin
+        volumes: # runtime volume for persisting MySQL data
+            # "Named Volume" Mount (For MySQL data persistence across container restarts)
+            # Named volume mount format is `named-volume:container-path`
+            - mysql-data:/var/lib/mysql
+            # Bind Mount (a bind mount directly maps a specific file or folder from your host
+            # machine's filesystem into the container).
+            # `:ro` means read-only — the container can read this file but cannot modify it.
+            # Bind mount format is `host-path:container-path:options`
+            - ./shipkartdb-dump.sql:/docker-entrypoint-initdb.d/shipkartdb-dump.sql:ro
+
+    config-server:
+        build:
+            context: .
+            dockerfile: ./shipkart-config-server/Dockerfile
+        image: config-server-image
+        container_name: config-server-container
+        ports:
+            - 8888:8888
+        networks:
+            - shipkart-network
+        # Healthcheck for config server — hits Spring Boot's actuator health endpoint
+        healthcheck:
+            test: ["CMD-SHELL", "curl -f http://localhost:8888/actuator/health || exit 1"]
+            interval: 10s      # run this check every 10 seconds
+            timeout: 5s        # if check takes longer than 5s, count as failed
+            retries: 5         # after 5 consecutive failures, mark as unhealthy
+            start_period: 40s  # Spring Boot needs time to start — be generous
+
+    api-gateway:
+        build:
+            context: .
+            dockerfile: ./shipkart-api-gateway/Dockerfile
+        image: api-gateway-image
+        container_name: api-gateway-container
+        ports:
+            - 9000:9000
+        depends_on:
+            - product-catalog
+            - product-info
+            - product-inventory
+        networks:
+            - shipkart-network
+
+    product-catalog:
+        build:
+            context: .
+            dockerfile: ./shipkart-productcatalog-service/Dockerfile
+        image: product-catalog-image
+        container_name: product-catalog-container
+        ports:
+            - 8081:8081
+        depends_on:
+            mysql:
+                condition: service_healthy
+            config-server:
+                condition: service_healthy
+            product-inventory:
+                condition: service_started
+        networks:
+            - shipkart-network
+
+    product-info:
+        build:
+            context: .
+            dockerfile: ./shipkart-productinfo-service/Dockerfile
+        image: product-info-image
+        container_name: product-info-container
+        ports:
+            - 8082:8082
+        depends_on:
+            - product-catalog
+        networks:
+            - shipkart-network
+
+    product-inventory:
+        build:
+            context: .
+            dockerfile: ./shipkart-productinventory-service/Dockerfile
+        image: product-inventory-image
+        container_name: product-inventory-container
+        ports:
+            - 8083:8083
+        depends_on:
+            mysql:
+                condition: service_healthy
+            config-server:
+                condition: service_healthy
+        networks:
+            - shipkart-network
+
+    product-cart:
+        build:
+            context: .
+            dockerfile: ./shipkart-productcart-service/Dockerfile
+        image: product-cart-image
+        container_name: product-cart-container
+        ports:
+            - 8084:8084
+        depends_on:
+            mysql:
+                condition: service_healthy
+            config-server:
+                condition: service_healthy
+            product-info:
+                condition: service_started
+        networks:
+            - shipkart-network
