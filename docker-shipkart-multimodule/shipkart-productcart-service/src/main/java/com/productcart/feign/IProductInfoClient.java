@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 
 import com.productcart.model.dtos.Product;
 
-@FeignClient(name = "product-info")
+@FeignClient(name = "product-info", url = "http://product-info:8082")
 public interface IProductInfoClient {
 
 	// GET http://localhost:8082/info-service/v1/products/productId/1

@@ -13,7 +13,7 @@ import com.productinfo.model.enums.Delivery;
 import com.productinfo.model.enums.OfferType;
 import com.productinfo.model.enums.Payment;
 
-@FeignClient(name = "product-catalog")
+@FeignClient(name = "product-catalog", url = "http://product-catalog:8081")
 public interface IProductCatalogFeignClient {
 
 	// GET http://localhost:8081/catalog-service/v1/products/productId/1
