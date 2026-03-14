@@ -1,0 +1,15 @@
+server:
+    port: 8091
+
+order:
+    topic-name: order-topic
+
+spring:
+    application:
+        name: order-producer
+    kafka:
+        producer:
+            bootstrap-servers:
+                - kafka-service:9092 # Name of the kafka service in docker compose
+            key-serializer: org.apache.kafka.common.serialization.StringSerializer
+            value-serializer: org.apache.kafka.common.serialization.StringSerializer

@@ -1,0 +1,17 @@
+server:
+    port: 8092
+
+order:
+    topic-name: order-topic
+
+spring:
+    application:
+        name: order-consumer
+    kafka:
+        consumer:
+            bootstrap-servers:
+                - kafka-service:9092 # Name of the kafka service in docker compose
+            group-id: order_group_id
+            auto-offset-reset: earliest
+            key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+            value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
