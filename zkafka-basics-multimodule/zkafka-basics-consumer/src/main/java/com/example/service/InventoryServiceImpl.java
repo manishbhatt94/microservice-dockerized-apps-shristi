@@ -6,6 +6,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Service;
 
+import com.example.model.Product;
+
 @Service
 public class InventoryServiceImpl implements IInventoryService {
 
@@ -22,9 +24,14 @@ public class InventoryServiceImpl implements IInventoryService {
 	}
 
 	@KafkaListener(topics = { "order-topic" }, groupId = "order_group_id")
-	public void consumeMessage(String messageReceived) {
+	private void consumeMessage(String messageReceived) {
 		logger.info("consumeMessage - received: {}", messageReceived);
 		messageStatus = messageReceived;
+	}
+
+	@KafkaListener(topics = { "product-topic" }, groupId = "order_group_id")
+	private void consumeProductDetails(Product product) {
+		logger.info("consumeProductDetails - received: {}", product);
 	}
 
 }
