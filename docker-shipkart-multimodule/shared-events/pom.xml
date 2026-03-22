@@ -3,21 +3,23 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
-	<parent>
+	<!--<parent>
 		<groupId>com.shipkart</groupId>
 		<artifactId>docker-shipkart-multimodule</artifactId>
 		<version>0.0.1-SNAPSHOT</version>
-	</parent>
+	</parent>-->
 
-	<groupId>com.shared</groupId>
+	<groupId>com.productshipkart.shared</groupId>
 	<artifactId>shared-events</artifactId>
-	<name>shared-events</name>
+	<version>0.0.1-SNAPSHOT</version>
 
+	<name>shared-events</name>
 	<description>Maven project that keep all shared Kafka Event DTOs</description>
 
 	<properties>
 		<maven.compiler.source>25</maven.compiler.source>
 		<maven.compiler.target>25</maven.compiler.target>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	</properties>
 
 	<dependencies>
@@ -25,6 +27,7 @@
 		<dependency>
 			<groupId>org.projectlombok</groupId>
 			<artifactId>lombok</artifactId>
+			<version>1.18.42</version>
 			<scope>compile</scope>
 		</dependency>
 	</dependencies>
