@@ -11,10 +11,14 @@ import lombok.ToString;
 @Getter
 @Setter
 @ToString
-public class OrderCreatedEvent {
+public class OrderItemDto {
 
-	private Integer orderId;
+	private Integer productId;
 
-	private String status;
+	private String productName; // snapshot! don't rely on FK later
+
+	private int quantity;
+
+	private double priceAtPurchase; // snapshot the price at the moment of order
 
 }
