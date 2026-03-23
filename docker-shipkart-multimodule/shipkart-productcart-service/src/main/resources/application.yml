@@ -19,6 +19,12 @@ spring:
         default: default
         active:
             - dev
+    kafka:
+        producer:
+            bootstrap-servers:
+                - kafka-service:9092 # Name of the kafka service in docker compose
+            key-serializer: org.apache.kafka.common.serialization.StringSerializer
+            value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
 
 server:
     port: 8084
@@ -51,3 +57,6 @@ resilience4j.circuitbreaker:
             failureRateThreshold: 50
             waitDurationInOpenState: 10s
             permittedNumberOfCallsInHalfOpenState: 2
+
+kafka-topic-names:
+    order-placed: order-placed-events

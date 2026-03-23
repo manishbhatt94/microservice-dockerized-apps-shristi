@@ -1,0 +1,9 @@
+{
+	"properties": [
+		{
+			"name": "kafka-topic-names.order-placed",
+			"type": "java.lang.String",
+			"description": "'kafka-topic-names.order-placed' - Kafka topic name for the Order Placed events."
+		}
+	]
+}
