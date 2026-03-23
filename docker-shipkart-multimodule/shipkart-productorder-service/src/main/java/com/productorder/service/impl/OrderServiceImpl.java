@@ -3,12 +3,19 @@ package com.productorder.service.impl;
 import java.util.List;
 
 import org.modelmapper.ModelMapper;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.kafka.annotation.KafkaListener;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
 import com.productorder.model.dtos.OrderDto;
 import com.productorder.model.entities.Order;
+import com.productorder.model.entities.OrderItem;
+import com.productorder.model.enums.OrderStatus;
 import com.productorder.repository.IOrderRepository;
 import com.productorder.service.IOrderService;
+import com.sharedevents.models.OrderPlacedEvent;
+import com.sharedevents.models.PaymentRequestedEvent;
 
 import lombok.RequiredArgsConstructor;
 
@@ -20,6 +27,14 @@ public class OrderServiceImpl implements IOrderService {
 
 	private final ModelMapper mapper;
 
+	private final KafkaTemplate<String, PaymentRequestedEvent> kafkaTemplate;
+
+	@Value("${kafka-topic-names.order-placed}")
+	private String orderPlacedTopicName;
+
+	@Value("${kafka-topic-names.payment-requested}")
+	private String paymentRequestedTopicName;
+
 	@Override
 	public OrderDto getOrderByOrderId(int orderId) {
 		Order order = orderRepository.findByOrderIdWithItems(orderId)
@@ -30,6 +45,36 @@ public class OrderServiceImpl implements IOrderService {
 	@Override
 	public List<OrderDto> getOrdersByUserId(int userId) {
 		return orderRepository.findByUserId(userId).stream().map(this::toOrderDto).toList();
+	}
+
+	@KafkaListener(topics = "order-placed-events") // orderPlacedTopicName
+	private void handleOrderPlacedEvent(OrderPlacedEvent orderEvent) {
+		Order savedOrder = createOrder(orderEvent);
+
+		// Publish event to "payment-requested-events" topic to initiate payment
+		PaymentRequestedEvent paymentEvent = new PaymentRequestedEvent();
+		paymentEvent.setOrderId(savedOrder.getOrderId());
+		paymentEvent.setUserId(orderEvent.getUserId());
+		paymentEvent.setAmount(orderEvent.getTotalAmount());
+
+		kafkaTemplate.send(paymentRequestedTopicName, savedOrder.getOrderId().toString(), paymentEvent);
+	}
+
+	private Order createOrder(OrderPlacedEvent event) {
+		Order order = new Order();
+		order.setStatus(OrderStatus.PENDING);
+		order.setUserId(event.getUserId());
+		order.setTotalAmount(event.getTotalAmount());
+		order.setPlacedAt(event.getPlacedAt());
+
+		List<OrderItem> orderItems = event.getItems().stream().map((itemDto) -> {
+			return mapper.map(itemDto, OrderItem.class);
+		}).toList();
+
+		order.setItems(orderItems);
+
+		// Save order to DB, and return saved entity object
+		return orderRepository.save(order);
 	}
 
 	private OrderDto toOrderDto(Order order) {

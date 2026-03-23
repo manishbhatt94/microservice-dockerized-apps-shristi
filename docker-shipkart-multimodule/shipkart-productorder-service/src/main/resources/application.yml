@@ -15,6 +15,24 @@ spring:
     config:
         import:
             - configserver:http://config-server:8888
+    kafka:
+        consumer:
+            bootstrap-servers:
+                - kafka-service:9092 # Name of the kafka service in docker compose
+            # group-id: order_group_id
+            auto-offset-reset: earliest
+            key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+            value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+            properties:
+                # "[spring.json.trusted.packages]": "*"
+                "[spring.json.trusted.packages]": "com.sharedevents.models"
+                "[spring.json.use.type.headers]": false
+                "[spring.json.value.default.type]": com.sharedevents.models.OrderPlacedEvent
+        producer:
+            bootstrap-servers:
+                - kafka-service:9092 # Name of the kafka service in docker compose
+            key-serializer: org.apache.kafka.common.serialization.StringSerializer
+            value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
 
 server:
     port: 8085
@@ -28,3 +46,7 @@ management:
     endpoint:
         health:
             show-details: always
+
+kafka-topic-names:
+    order-placed: order-placed-events
+    payment-requested: payment-requested-events
