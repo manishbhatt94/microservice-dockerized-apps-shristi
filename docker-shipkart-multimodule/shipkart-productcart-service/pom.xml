@@ -32,6 +32,12 @@
 	</scm>
 
 	<dependencies>
+		<dependency> <!--Local dependency - for common Kafka event DTOs-->
+			<groupId>com.productshipkart.shared</groupId>
+			<artifactId>shared-events</artifactId>
+			<version>0.0.1-SNAPSHOT</version>
+		</dependency>
+
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-data-jpa</artifactId>

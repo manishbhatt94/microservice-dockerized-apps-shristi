@@ -23,6 +23,7 @@
 	</properties>
 
 	<modules>
+		<module>shared-events</module>
 		<module>shipkart-api-gateway</module>
 		<module>shipkart-config-server</module>
 		<module>shipkart-productcart-service</module>
