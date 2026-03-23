@@ -43,26 +43,20 @@ public class CartServiceImpl implements ICartService {
 			return newCart;
 		});
 
-		cart
-				.getCartItems()
-				.stream()
-				.filter(cartItem -> cartItem.getProductId() == productId)
-				.findFirst()
-				.ifPresentOrElse(
-						(existingItem) -> {
-							existingItem.setQuantity(existingItem.getQuantity() + quantity);
-						},
-						() -> {
-							CartItem newItem = new CartItem();
-							newItem.setProductId(productId);
-							newItem.setQuantity(quantity);
-							newItem.setProductName(product.getProductName());
-							newItem.setPrice(product.getPrice());
-							// Add newItem to the list of already available items, and
-							// Store reference of cart in the new cartItem (for bi-directional linking and
-							// storing cart_id foreign key in the cart_item record)
-							cart.addCartItem(newItem); // This one line handles BOTH sides of the link!
-						});
+		cart.getCartItems().stream().filter(cartItem -> cartItem.getProductId() == productId).findFirst()
+				.ifPresentOrElse((existingItem) -> {
+					existingItem.setQuantity(existingItem.getQuantity() + quantity);
+				}, () -> {
+					CartItem newItem = new CartItem();
+					newItem.setProductId(productId);
+					newItem.setQuantity(quantity);
+					newItem.setProductName(product.getProductName());
+					newItem.setPrice(product.getPrice());
+					// Add newItem to the list of already available items, and
+					// Store reference of cart in the new cartItem (for bi-directional linking and
+					// storing cart_id foreign key in the cart_item record)
+					cart.addCartItem(newItem); // This one line handles BOTH sides of the link!
+				});
 
 		// 4. Update Totals and Save
 		cart.setTotalPrice(computeCartTotalPrice(cart.getCartItems()));
@@ -78,9 +72,7 @@ public class CartServiceImpl implements ICartService {
 	@Override
 	@Transactional(readOnly = true)
 	public CartDto viewCart(int userId) {
-		return repository
-				.findByUserIdWithItems(userId)
-				.map(mapper::toCartDto)
+		return repository.findByUserIdWithItems(userId).map(mapper::toCartDto)
 				.orElseGet(() -> new CartDto(null, userId, new ArrayList<>(), 0));
 	}
 
