@@ -8,4 +8,8 @@ public interface ICartService {
 
 	CartDto viewCart(int userId);
 
+	String placeOrder(int userId);
+
+	String clearCart(int userId);
+
 }

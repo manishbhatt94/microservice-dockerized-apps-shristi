@@ -1,8 +1,11 @@
 package com.productcart.service.impl;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -14,6 +17,8 @@ import com.productcart.model.entities.CartItem;
 import com.productcart.repository.ICartRepository;
 import com.productcart.service.ICartService;
 import com.productcart.util.CartMapper;
+import com.sharedevents.models.OrderItemDto;
+import com.sharedevents.models.OrderPlacedEvent;
 
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import lombok.RequiredArgsConstructor;
@@ -28,6 +33,11 @@ public class CartServiceImpl implements ICartService {
 	private final IProductInfoClient infoClient;
 
 	private final CartMapper mapper;
+
+	private final KafkaTemplate<String, OrderPlacedEvent> template;
+
+	@Value("${kafka-topic-names.order-placed}")
+	private String orderPlacedTopicName;
 
 	@Override
 	@CircuitBreaker(name = "cartService", fallbackMethod = "addToCartFallback")
@@ -76,8 +86,58 @@ public class CartServiceImpl implements ICartService {
 				.orElseGet(() -> new CartDto(null, userId, new ArrayList<>(), 0));
 	}
 
+	@Override
+	public String placeOrder(int userId) {
+		Cart cart = repository.findByUserIdWithItems(userId).orElseThrow(() -> new RuntimeException(
+				String.format("Cannot place order. Cart not populated for userId: %d", userId)));
+		if (cart.getCartItems().isEmpty()) {
+			throw new RuntimeException(String.format("Cannot place order. Cart not populated for userId: %d", userId));
+		}
+		OrderPlacedEvent orderPlacedEvent = fromCartToOrderPlacedEvent(cart);
+		template.send(orderPlacedTopicName, Integer.toString(userId), orderPlacedEvent);
+		// After, publishing OrderPlacedEvent to "order-placed-events" Kafka topic,
+		// we will clear the cart
+		clearCartHelper(cart);
+		repository.save(cart);
+		return "Order placed";
+	}
+
+	@Override
+	public String clearCart(int userId) {
+		Cart cart = repository.findByUserIdWithItems(userId)
+				.orElseThrow(() -> new RuntimeException(String.format("Cannot find cart for userId: %d", userId)));
+		clearCartHelper(cart);
+		repository.save(cart);
+		return "Cart cleared";
+	}
+
 	private double computeCartTotalPrice(List<CartItem> cartItems) {
 		return cartItems.stream().mapToDouble(cartItem -> cartItem.getPrice() * cartItem.getQuantity()).sum();
+	}
+
+	private OrderPlacedEvent fromCartToOrderPlacedEvent(Cart cart) {
+		OrderPlacedEvent orderPlacedEvent = new OrderPlacedEvent();
+		orderPlacedEvent.setUserId(cart.getUserId());
+		orderPlacedEvent.setTotalAmount(cart.getTotalPrice());
+		orderPlacedEvent.setPlacedAt(LocalDateTime.now());
+
+		List<OrderItemDto> items = cart.getCartItems().stream().map((cartItem) -> {
+			OrderItemDto orderItem = new OrderItemDto();
+			orderItem.setProductId(cartItem.getProductId());
+			orderItem.setProductName(cartItem.getProductName());
+			orderItem.setQuantity(cartItem.getQuantity());
+			orderItem.setPriceAtPurchase(cartItem.getPrice());
+			return orderItem;
+		}).toList();
+
+		orderPlacedEvent.setItems(items);
+
+		return orderPlacedEvent;
+	}
+
+	private void clearCartHelper(Cart cart) {
+		cart.getCartItems().clear();
+		cart.setTotalPrice(0.0);
 	}
 
 }
