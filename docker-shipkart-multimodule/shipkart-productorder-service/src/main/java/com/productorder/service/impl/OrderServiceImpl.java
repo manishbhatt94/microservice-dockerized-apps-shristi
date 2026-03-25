@@ -31,9 +31,6 @@ public class OrderServiceImpl implements IOrderService {
 
 	private final KafkaTemplate<String, PaymentRequestedEvent> kafkaTemplate;
 
-	@Value("${kafka-topic-names.order-placed}")
-	private String orderPlacedTopicName;
-
 	@Value("${kafka-topic-names.payment-requested}")
 	private String paymentRequestedTopicName;
 
@@ -51,7 +48,8 @@ public class OrderServiceImpl implements IOrderService {
 		return orderRepository.findByUserId(userId).stream().map(this::toOrderDto).toList();
 	}
 
-	@KafkaListener(topics = "order-placed-events") // orderPlacedTopicName
+	@KafkaListener(topics = "${kafka-topic-names.order-placed}", groupId = "product_order-group", properties = {
+			"spring.json.value.default.type=com.sharedevents.models.OrderPlacedEvent" })
 	private void handleOrderPlacedEvent(OrderPlacedEvent orderEvent) {
 		logger.info("Consume OrderPlacedEvent. Event: {}", orderEvent);
 

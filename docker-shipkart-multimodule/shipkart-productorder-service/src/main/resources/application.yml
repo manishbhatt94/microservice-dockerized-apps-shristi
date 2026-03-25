@@ -18,21 +18,22 @@ spring:
     kafka:
         consumer:
             bootstrap-servers:
-                - kafka-service:9092 # Name of the kafka service in docker compose
-            # group-id: order_group_id
+                - kafka-service:9092 # Name of the kafka service in docker compose.
+            # group-id -- Defined separately with each KafkaListener annotation.
             auto-offset-reset: earliest
             key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
             value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
             properties:
-                # "[spring.json.trusted.packages]": "*"
                 "[spring.json.trusted.packages]": "com.sharedevents.models"
-                "[spring.json.use.type.headers]": false
-                "[spring.json.value.default.type]": com.sharedevents.models.OrderPlacedEvent
+                "[spring.json.use.type.headers]": false # Consumer ignores __TypeId__ header in messages.
+                # spring.json.value.default.type -- Defined separately with each KafkaListener annotation.
         producer:
             bootstrap-servers:
-                - kafka-service:9092 # Name of the kafka service in docker compose
+                - kafka-service:9092 # Name of the kafka service in docker compose.
             key-serializer: org.apache.kafka.common.serialization.StringSerializer
             value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+            properties:
+                "[spring.json.add.type.headers]": false # Stops producer from adding __TypeId__ header.
 
 server:
     port: 8085
@@ -50,3 +51,4 @@ management:
 kafka-topic-names:
     order-placed: order-placed-events
     payment-requested: payment-requested-events
+    payment-result: payment-result-events
