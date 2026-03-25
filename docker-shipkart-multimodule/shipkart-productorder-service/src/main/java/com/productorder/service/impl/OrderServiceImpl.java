@@ -3,6 +3,8 @@ package com.productorder.service.impl;
 import java.util.List;
 
 import org.modelmapper.ModelMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.core.KafkaTemplate;
@@ -35,6 +37,8 @@ public class OrderServiceImpl implements IOrderService {
 	@Value("${kafka-topic-names.payment-requested}")
 	private String paymentRequestedTopicName;
 
+	private Logger logger = LoggerFactory.getLogger(OrderServiceImpl.class);
+
 	@Override
 	public OrderDto getOrderByOrderId(int orderId) {
 		Order order = orderRepository.findByOrderIdWithItems(orderId)
@@ -49,6 +53,8 @@ public class OrderServiceImpl implements IOrderService {
 
 	@KafkaListener(topics = "order-placed-events") // orderPlacedTopicName
 	private void handleOrderPlacedEvent(OrderPlacedEvent orderEvent) {
+		logger.info("Consume OrderPlacedEvent. Event: {}", orderEvent);
+
 		Order savedOrder = createOrder(orderEvent);
 
 		// Publish event to "payment-requested-events" topic to initiate payment
@@ -59,6 +65,8 @@ public class OrderServiceImpl implements IOrderService {
 		paymentEvent.setPaymentMode(orderEvent.getPaymentMode());
 
 		kafkaTemplate.send(paymentRequestedTopicName, savedOrder.getOrderId().toString(), paymentEvent);
+
+		logger.info("Produce PaymentRequestedEvent. Event: {}", paymentEvent);
 	}
 
 	private Order createOrder(OrderPlacedEvent event) {

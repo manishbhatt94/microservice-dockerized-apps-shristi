@@ -4,6 +4,8 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
@@ -38,6 +40,8 @@ public class CartServiceImpl implements ICartService {
 
 	@Value("${kafka-topic-names.order-placed}")
 	private String orderPlacedTopicName;
+
+	private Logger logger = LoggerFactory.getLogger(CartServiceImpl.class);
 
 	@Override
 	@CircuitBreaker(name = "cartService", fallbackMethod = "addToCartFallback")
@@ -93,8 +97,11 @@ public class CartServiceImpl implements ICartService {
 		if (cart.getCartItems().isEmpty()) {
 			throw new RuntimeException(String.format("Cannot place order. Cart not populated for userId: %d", userId));
 		}
-		OrderPlacedEvent orderPlacedEvent = fromCartToOrderPlacedEvent(cart);
+		OrderPlacedEvent orderPlacedEvent = createOrderPlacedEvent(cart);
 		template.send(orderPlacedTopicName, Integer.toString(userId), orderPlacedEvent);
+
+		logger.info("Produce OrderPlacedEvent. Event: {}", orderPlacedEvent);
+
 		// After, publishing OrderPlacedEvent to "order-placed-events" Kafka topic,
 		// we will clear the cart
 		clearCartHelper(cart);
@@ -115,7 +122,7 @@ public class CartServiceImpl implements ICartService {
 		return cartItems.stream().mapToDouble(cartItem -> cartItem.getPrice() * cartItem.getQuantity()).sum();
 	}
 
-	private OrderPlacedEvent fromCartToOrderPlacedEvent(Cart cart) {
+	private OrderPlacedEvent createOrderPlacedEvent(Cart cart) {
 		OrderPlacedEvent orderPlacedEvent = new OrderPlacedEvent();
 		orderPlacedEvent.setUserId(cart.getUserId());
 		orderPlacedEvent.setTotalAmount(cart.getTotalPrice());
