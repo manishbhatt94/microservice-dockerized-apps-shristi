@@ -7,6 +7,7 @@ import java.util.List;
 import com.productorder.model.enums.OrderStatus;
 
 import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -37,10 +38,13 @@ public class Order {
 	@EqualsAndHashCode.Include
 	private Integer orderId;
 
+	@Column(nullable = false)
 	private Integer userId;
 
+	@Column(nullable = false)
 	private double totalAmount;
 
+	@Column(nullable = false)
 	@Enumerated(EnumType.STRING)
 	private OrderStatus status;
 

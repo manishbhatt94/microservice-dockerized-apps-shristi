@@ -1,5 +1,6 @@
 package com.productorder.model.entities;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
@@ -31,15 +32,19 @@ public class OrderItem {
 	private Integer orderItemId;
 
 	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "order_id")
+	@JoinColumn(name = "order_id", nullable = false)
 	private Order order;
 
+	@Column(nullable = false)
 	private Integer productId;
 
+	@Column(nullable = false)
 	private String productName; // snapshot from event
 
+	@Column(nullable = false)
 	private int quantity;
 
+	@Column(nullable = false)
 	private double priceAtPurchase; // snapshot from event
 
 }
