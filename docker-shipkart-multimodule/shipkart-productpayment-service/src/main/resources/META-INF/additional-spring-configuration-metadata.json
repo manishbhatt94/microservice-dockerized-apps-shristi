@@ -1,0 +1,19 @@
+{
+	"properties": [
+		{
+			"name": "kafka-topic-names.order-placed",
+			"type": "java.lang.String",
+			"description": "'kafka-topic-names.order-placed' - Kafka topic name for the Order Placed events."
+		},
+		{
+			"name": "kafka-topic-names.payment-requested",
+			"type": "java.lang.String",
+			"description": "'kafka-topic-names.payment-requested' - Kafka topic name for the Payment Requested events."
+		},
+		{
+			"name": "kafka-topic-names.payment-result",
+			"type": "java.lang.String",
+			"description": "'kafka-topic-names.payment-result' - Kafka topic name for the Payment Result events."
+		}
+	]
+}
