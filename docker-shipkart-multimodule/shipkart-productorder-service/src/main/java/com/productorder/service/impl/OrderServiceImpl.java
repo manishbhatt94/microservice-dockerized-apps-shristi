@@ -56,6 +56,7 @@ public class OrderServiceImpl implements IOrderService {
 		paymentEvent.setOrderId(savedOrder.getOrderId());
 		paymentEvent.setUserId(orderEvent.getUserId());
 		paymentEvent.setAmount(orderEvent.getTotalAmount());
+		paymentEvent.setPaymentMode(orderEvent.getPaymentMode());
 
 		kafkaTemplate.send(paymentRequestedTopicName, savedOrder.getOrderId().toString(), paymentEvent);
 	}
