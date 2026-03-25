@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.productcart.model.dtos.AddToCartRequestDto;
 import com.productcart.model.dtos.CartDto;
+import com.productcart.model.dtos.CheckoutRequestDto;
 import com.productcart.service.ICartService;
 
 import lombok.RequiredArgsConstructor;
@@ -42,8 +43,8 @@ public class CartController {
 	// POST
 	// http://localhost:8084/cart-service/v1/cart/userId/1/place-order
 	@PostMapping("/cart/userId/{userId}/place-order")
-	ResponseEntity<String> placeOrder(@PathVariable int userId) {
-		String message = cartService.placeOrder(userId);
+	ResponseEntity<String> placeOrder(@PathVariable int userId, @RequestBody CheckoutRequestDto requestBody) {
+		String message = cartService.placeOrder(userId, requestBody);
 		return ResponseEntity.ok(message);
 	}
 

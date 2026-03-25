@@ -13,6 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.productcart.feign.IProductInfoClient;
 import com.productcart.model.dtos.CartDto;
+import com.productcart.model.dtos.CheckoutRequestDto;
 import com.productcart.model.dtos.Product;
 import com.productcart.model.entities.Cart;
 import com.productcart.model.entities.CartItem;
@@ -91,13 +92,13 @@ public class CartServiceImpl implements ICartService {
 	}
 
 	@Override
-	public String placeOrder(int userId) {
+	public String placeOrder(int userId, CheckoutRequestDto checkoutRequestBody) {
 		Cart cart = repository.findByUserIdWithItems(userId).orElseThrow(() -> new RuntimeException(
 				String.format("Cannot place order. Cart not populated for userId: %d", userId)));
 		if (cart.getCartItems().isEmpty()) {
 			throw new RuntimeException(String.format("Cannot place order. Cart not populated for userId: %d", userId));
 		}
-		OrderPlacedEvent orderPlacedEvent = createOrderPlacedEvent(cart);
+		OrderPlacedEvent orderPlacedEvent = createOrderPlacedEvent(cart, checkoutRequestBody);
 		template.send(orderPlacedTopicName, Integer.toString(userId), orderPlacedEvent);
 
 		logger.info("Produce OrderPlacedEvent. Event: {}", orderPlacedEvent);
@@ -122,11 +123,11 @@ public class CartServiceImpl implements ICartService {
 		return cartItems.stream().mapToDouble(cartItem -> cartItem.getPrice() * cartItem.getQuantity()).sum();
 	}
 
-	private OrderPlacedEvent createOrderPlacedEvent(Cart cart) {
+	private OrderPlacedEvent createOrderPlacedEvent(Cart cart, CheckoutRequestDto checkoutRequestBody) {
 		OrderPlacedEvent orderPlacedEvent = new OrderPlacedEvent();
 		orderPlacedEvent.setUserId(cart.getUserId());
 		orderPlacedEvent.setTotalAmount(cart.getTotalPrice());
-		orderPlacedEvent.setPaymentMode("MOCK_PAYMENT_MODE");
+		orderPlacedEvent.setPaymentMode(checkoutRequestBody.getPaymentMethod());
 		orderPlacedEvent.setPlacedAt(LocalDateTime.now());
 
 		List<OrderItemDto> items = cart.getCartItems().stream().map((cartItem) -> {

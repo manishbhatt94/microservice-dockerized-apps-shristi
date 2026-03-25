@@ -1,6 +1,7 @@
 package com.productcart.service;
 
 import com.productcart.model.dtos.CartDto;
+import com.productcart.model.dtos.CheckoutRequestDto;
 
 public interface ICartService {
 
@@ -8,7 +9,7 @@ public interface ICartService {
 
 	CartDto viewCart(int userId);
 
-	String placeOrder(int userId);
+	String placeOrder(int userId, CheckoutRequestDto checkoutRequestBody);
 
 	String clearCart(int userId);
 

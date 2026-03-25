@@ -13,12 +13,10 @@ import lombok.ToString;
 @Setter
 @ToString
 @EqualsAndHashCode
-public class AddToCartRequestDto {
+public class CheckoutRequestDto {
 
-	private int userId;
+	private String paymentMethod; // "UPI", "CARD", "MOCK"
 
-	private int productId;
-
-	private int quantity;
+	// private AddressDto address; // add later
 
 }
