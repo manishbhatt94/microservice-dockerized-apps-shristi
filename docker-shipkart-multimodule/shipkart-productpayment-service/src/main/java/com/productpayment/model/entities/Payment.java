@@ -40,13 +40,13 @@ public class Payment {
 	private Integer paymentId;
 
 	@Column(unique = true, nullable = false)
-	private Long orderId; // reference to product-orders (no FK — different DB)
+	private Integer orderId; // reference to product-orders (no FK — different DB)
 
 	@Column(nullable = false)
 	private Integer userId;
 
 	@Column(nullable = false)
-	private Double amount;
+	private double amount;
 
 	// `paymentMethod` in Payment entity — what the user chose at checkout
 	private String paymentMethod; // "UPI", "CARD", "NETBANKING", "MOCK"
