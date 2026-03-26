@@ -19,6 +19,6 @@ public class PaymentRequestedEvent {
 
 	private double amount;
 
-	private String paymentMode;
+	private String paymentMethod;
 
 }

@@ -39,7 +39,7 @@ public class OrderListeners {
 		paymentEvent.setOrderId(savedOrder.getOrderId());
 		paymentEvent.setUserId(orderEvent.getUserId());
 		paymentEvent.setAmount(orderEvent.getTotalAmount());
-		paymentEvent.setPaymentMode(orderEvent.getPaymentMode());
+		paymentEvent.setPaymentMethod(orderEvent.getPaymentMethod());
 
 		kafkaTemplate.send(paymentRequestedTopicName, savedOrder.getOrderId().toString(), paymentEvent);
 

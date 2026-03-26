@@ -127,7 +127,7 @@ public class CartServiceImpl implements ICartService {
 		OrderPlacedEvent orderPlacedEvent = new OrderPlacedEvent();
 		orderPlacedEvent.setUserId(cart.getUserId());
 		orderPlacedEvent.setTotalAmount(cart.getTotalPrice());
-		orderPlacedEvent.setPaymentMode(checkoutRequestBody.getPaymentMethod());
+		orderPlacedEvent.setPaymentMethod(checkoutRequestBody.getPaymentMethod());
 		orderPlacedEvent.setPlacedAt(LocalDateTime.now());
 
 		List<OrderItemDto> items = cart.getCartItems().stream().map((cartItem) -> {

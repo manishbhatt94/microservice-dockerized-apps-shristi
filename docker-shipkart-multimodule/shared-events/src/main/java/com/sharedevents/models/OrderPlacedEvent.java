@@ -22,7 +22,7 @@ public class OrderPlacedEvent {
 
 	private double totalAmount;
 
-	private String paymentMode;
+	private String paymentMethod;
 
 	private LocalDateTime placedAt;
 
