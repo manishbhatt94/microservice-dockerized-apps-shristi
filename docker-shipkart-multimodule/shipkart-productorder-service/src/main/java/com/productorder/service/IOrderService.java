@@ -5,6 +5,7 @@ import java.util.List;
 import com.productorder.model.dtos.OrderDto;
 import com.productorder.model.entities.Order;
 import com.sharedevents.models.OrderPlacedEvent;
+import com.sharedevents.models.PaymentResultEvent;
 
 public interface IOrderService {
 
@@ -13,5 +14,7 @@ public interface IOrderService {
 	List<OrderDto> getOrdersByUserId(int userId);
 
 	Order createOrder(OrderPlacedEvent event);
+
+	void handlePaymentResult(PaymentResultEvent event);
 
 }

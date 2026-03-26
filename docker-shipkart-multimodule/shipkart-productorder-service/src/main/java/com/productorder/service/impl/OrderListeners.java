@@ -11,6 +11,7 @@ import com.productorder.model.entities.Order;
 import com.productorder.service.IOrderService;
 import com.sharedevents.models.OrderPlacedEvent;
 import com.sharedevents.models.PaymentRequestedEvent;
+import com.sharedevents.models.PaymentResultEvent;
 
 import lombok.RequiredArgsConstructor;
 
@@ -44,6 +45,13 @@ public class OrderListeners {
 		kafkaTemplate.send(paymentRequestedTopicName, savedOrder.getOrderId().toString(), paymentEvent);
 
 		logger.info("Produce PaymentRequestedEvent. Event: {}", paymentEvent);
+	}
+
+	@KafkaListener(topics = "${kafka-topic-names.payment-result}", groupId = "product_order-group", properties = {
+			"spring.json.value.default.type=com.sharedevents.models.PaymentResultEvent" })
+	public void handlePaymentResultEvent(PaymentResultEvent event) {
+		logger.info("Consume PaymentResultEvent. Event: {}", event);
+		orderService.handlePaymentResult(event);
 	}
 
 }

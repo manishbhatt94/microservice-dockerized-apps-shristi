@@ -48,6 +48,11 @@ public class Order {
 	@Enumerated(EnumType.STRING)
 	private OrderStatus status;
 
+	private Integer paymentId; // null until PaymentResultEvent received
+	// no FK constraint — different microservice owns this ID
+
+	private String paymentMethod; // snapshot from CheckoutRequestDto
+
 	private LocalDateTime placedAt;
 
 	private LocalDateTime updatedAt;
