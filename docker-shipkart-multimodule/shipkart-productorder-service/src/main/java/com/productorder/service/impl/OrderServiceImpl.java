@@ -3,11 +3,6 @@ package com.productorder.service.impl;
 import java.util.List;
 
 import org.modelmapper.ModelMapper;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.kafka.annotation.KafkaListener;
-import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
 import com.productorder.model.dtos.OrderDto;
@@ -17,7 +12,6 @@ import com.productorder.model.enums.OrderStatus;
 import com.productorder.repository.IOrderRepository;
 import com.productorder.service.IOrderService;
 import com.sharedevents.models.OrderPlacedEvent;
-import com.sharedevents.models.PaymentRequestedEvent;
 
 import lombok.RequiredArgsConstructor;
 
@@ -28,13 +22,6 @@ public class OrderServiceImpl implements IOrderService {
 	private final IOrderRepository orderRepository;
 
 	private final ModelMapper mapper;
-
-	private final KafkaTemplate<String, PaymentRequestedEvent> kafkaTemplate;
-
-	@Value("${kafka-topic-names.payment-requested}")
-	private String paymentRequestedTopicName;
-
-	private Logger logger = LoggerFactory.getLogger(OrderServiceImpl.class);
 
 	@Override
 	public OrderDto getOrderByOrderId(int orderId) {
@@ -48,26 +35,8 @@ public class OrderServiceImpl implements IOrderService {
 		return orderRepository.findByUserId(userId).stream().map(this::toOrderDto).toList();
 	}
 
-	@KafkaListener(topics = "${kafka-topic-names.order-placed}", groupId = "product_order-group", properties = {
-			"spring.json.value.default.type=com.sharedevents.models.OrderPlacedEvent" })
-	private void handleOrderPlacedEvent(OrderPlacedEvent orderEvent) {
-		logger.info("Consume OrderPlacedEvent. Event: {}", orderEvent);
-
-		Order savedOrder = createOrder(orderEvent);
-
-		// Publish event to "payment-requested-events" topic to initiate payment
-		PaymentRequestedEvent paymentEvent = new PaymentRequestedEvent();
-		paymentEvent.setOrderId(savedOrder.getOrderId());
-		paymentEvent.setUserId(orderEvent.getUserId());
-		paymentEvent.setAmount(orderEvent.getTotalAmount());
-		paymentEvent.setPaymentMode(orderEvent.getPaymentMode());
-
-		kafkaTemplate.send(paymentRequestedTopicName, savedOrder.getOrderId().toString(), paymentEvent);
-
-		logger.info("Produce PaymentRequestedEvent. Event: {}", paymentEvent);
-	}
-
-	private Order createOrder(OrderPlacedEvent event) {
+	@Override
+	public Order createOrder(OrderPlacedEvent event) {
 		Order order = new Order();
 		order.setStatus(OrderStatus.PENDING);
 		order.setUserId(event.getUserId());
