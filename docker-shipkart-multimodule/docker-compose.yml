@@ -130,3 +130,35 @@ services:
                 condition: service_started
         networks:
             - shipkart-network
+
+    product-order:
+        build:
+            context: .
+            dockerfile: ./shipkart-productorder-service/Dockerfile
+        image: product-order-image
+        container_name: product-order-container
+        ports:
+            - 8085:8085
+        depends_on:
+            mysql:
+                condition: service_healthy
+            config-server:
+                condition: service_healthy
+        networks:
+            - shipkart-network
+
+    product-payment:
+        build:
+            context: .
+            dockerfile: ./shipkart-productpayment-service/Dockerfile
+        image: product-payment-image
+        container_name: product-payment-container
+        ports:
+            - 8086:8086
+        depends_on:
+            mysql:
+                condition: service_healthy
+            config-server:
+                condition: service_healthy
+        networks:
+            - shipkart-network
