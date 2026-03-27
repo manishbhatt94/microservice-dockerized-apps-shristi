@@ -31,5 +31,6 @@
 		<module>shipkart-productinfo-service</module>
 		<module>shipkart-productinventory-service</module>
 		<module>shipkart-productorder-service</module>
+		<module>shipkart-productpayment-service</module>
 	</modules>
 </project>
