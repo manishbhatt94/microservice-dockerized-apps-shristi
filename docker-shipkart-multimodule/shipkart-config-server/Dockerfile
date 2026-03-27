@@ -25,6 +25,8 @@ COPY shipkart-productcart-service/pom.xml       ./shipkart-productcart-service/p
 COPY shipkart-productcatalog-service/pom.xml    ./shipkart-productcatalog-service/pom.xml
 COPY shipkart-productinfo-service/pom.xml       ./shipkart-productinfo-service/pom.xml
 COPY shipkart-productinventory-service/pom.xml  ./shipkart-productinventory-service/pom.xml
+COPY shipkart-productorder-service/pom.xml      ./shipkart-productorder-service/pom.xml
+COPY shipkart-productpayment-service/pom.xml    ./shipkart-productpayment-service/pom.xml
 
 # NOW Maven can scan the project without crashing.
 # -pl (Project List) targets only this module,
