@@ -31,6 +31,7 @@ public class OrderListeners {
 	@KafkaListener(topics = "${kafka-topic-names.order-placed}", groupId = "product_order-group", properties = {
 			"spring.json.value.default.type=com.sharedevents.models.OrderPlacedEvent" })
 	public void handleOrderPlacedEvent(OrderPlacedEvent orderEvent) {
+
 		logger.info("Consume OrderPlacedEvent. Event: {}", orderEvent);
 
 		Order savedOrder = orderService.createOrder(orderEvent);
@@ -50,6 +51,7 @@ public class OrderListeners {
 	@KafkaListener(topics = "${kafka-topic-names.payment-result}", groupId = "product_order-group", properties = {
 			"spring.json.value.default.type=com.sharedevents.models.PaymentResultEvent" })
 	public void handlePaymentResultEvent(PaymentResultEvent event) {
+
 		logger.info("Consume PaymentResultEvent. Event: {}", event);
 		orderService.handlePaymentResult(event);
 	}

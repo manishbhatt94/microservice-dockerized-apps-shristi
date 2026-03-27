@@ -2,6 +2,8 @@ package com.productpayment.service;
 
 import java.time.LocalDateTime;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
@@ -30,6 +32,8 @@ public class PaymentServiceImpl implements IPaymentService {
 
 	@Value("${kafka-topic-names.payment-result}")
 	private String paymentResultTopic;
+
+	private Logger logger = LoggerFactory.getLogger(PaymentServiceImpl.class);
 
 	@Override
 	public void processPayment(PaymentRequestedEvent event) {
@@ -83,6 +87,8 @@ public class PaymentServiceImpl implements IPaymentService {
 
 		kafkaTemplate.send(paymentResultTopic, event.getOrderId().toString(), // partition key
 				resultEvent);
+
+		logger.info("Produce PaymentResultEvent. Event: {}", resultEvent);
 
 	}
 
