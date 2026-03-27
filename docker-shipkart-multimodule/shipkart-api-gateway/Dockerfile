@@ -14,7 +14,16 @@ WORKDIR /build
 # This works because docker-compose.yml sets context: . (project root)
 COPY pom.xml ./pom.xml
 
-# Copy ALL six module POMs so Maven can verify the full
+# Copy POM of `shared-events` app as well, even though it is not a POM
+# dependency of this app (to which this Dockerfile belongs), but `shared-events`
+# being declared in the modules list of root POM, Maven needs all declared
+# modules' POM to be present.
+COPY shared-events/pom.xml  ./shared-events/pom.xml
+# No need to copy shared-events/src for these services
+# They do not depend on shared-events, they just need the POM
+# to satisfy Maven's module verification of the root POM
+
+# Copy ALL the eight module POMs so Maven can verify the full
 # project structure without crashing at startup.
 # Only one of these modules will actually be compiled —
 # but all folders must exist for Maven to verify the <modules>
