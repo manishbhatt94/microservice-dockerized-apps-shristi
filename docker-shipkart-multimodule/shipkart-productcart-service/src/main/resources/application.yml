@@ -22,9 +22,11 @@ spring:
     kafka:
         producer:
             bootstrap-servers:
-                - kafka-service:9092 # Name of the kafka service in docker compose
+                - kafka-service:9092 # Name of the kafka service in docker compose.
             key-serializer: org.apache.kafka.common.serialization.StringSerializer
             value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+            properties:
+                "[spring.json.add.type.headers]": false # Stops producer from adding __TypeId__ header.
 
 server:
     port: 8084
