@@ -1,6 +1,5 @@
 package com.sharedevents.models;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 import lombok.AllArgsConstructor;
@@ -24,6 +23,6 @@ public class OrderPlacedEvent {
 
 	private String paymentMethod;
 
-	private LocalDateTime placedAt;
+	private String placedAt;
 
 }

@@ -44,7 +44,7 @@ public class OrderServiceImpl implements IOrderService {
 		order.setUserId(event.getUserId());
 		order.setTotalAmount(event.getTotalAmount());
 		order.setPaymentMethod(event.getPaymentMethod());
-		order.setPlacedAt(event.getPlacedAt());
+		order.setPlacedAt(event.getPlacedAt() != null ? LocalDateTime.parse(event.getPlacedAt()) : LocalDateTime.now());
 
 		List<OrderItem> orderItems = event.getItems().stream().map((itemDto) -> {
 			return mapper.map(itemDto, OrderItem.class);
