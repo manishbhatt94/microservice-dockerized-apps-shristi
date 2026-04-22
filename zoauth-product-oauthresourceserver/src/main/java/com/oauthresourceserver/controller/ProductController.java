@@ -29,7 +29,10 @@ public class ProductController {
 		return Arrays.asList(new Product(1, "Nike Jordans Relax Sneakers", 15999.0),
 				new Product(2, "Skmei Digital Sports Wristwatch", 2520.0),
 				new Product(3, "Ikea Spring Workdesk Standing Desk", 19500.0),
-				new Product(4, "Yamaha YamaLube Chain Lube", 399.0));
+				new Product(4, "Yamaha YamaLube Chain Lube", 399.0),
+				new Product(5, "Lizol Floor Cleaner Liquid Lavender - 10 Litre", 850.0),
+				new Product(6, "Hawkins Venchura - Induction Cook Top - 2400 Watt", 3930.0),
+				new Product(7, "Xiaomi Mi Band 8", 6250.0));
 	}
 
 }
