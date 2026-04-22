@@ -7,3 +7,14 @@ spring:
     security:
         oauth2:
             client:
+                registration:
+                    order-client:
+                        provider: order-provider
+                        client-id: order-client
+                        client-secret: order-client-secret
+                        authorization-grant-type: client_credentials
+                        scope:
+                            - read
+                provider:
+                    order-provider:
+                        token-uri: http://localhost:9001/oauth2/token
